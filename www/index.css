@@ -1,0 +1,13 @@
+.editor-container {
+  display: flex;
+  gap: 8px;
+  min-height: 200px;
+}
+
+.editor-container textarea {
+  flex: 1;
+}
+
+.valid {
+  color: green;
+}

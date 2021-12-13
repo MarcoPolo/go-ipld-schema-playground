@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="./index.css">
+	<title>IPLD Schema Checker</title>
+</head>
+
+<body>
+	<!--
+	Add the following polyfill for Microsoft Edge 17/18 support:
+	<script src="https://cdn.jsdelivr.net/npm/text-encoding@0.7.0/lib/encoding.min.js"></script>
+	(see https://caniuse.com/#feat=textencoder)
+	-->
+	<script src="wasm_exec.js"></script>
+	<script>
+		if (!WebAssembly.instantiateStreaming) { // polyfill
+			WebAssembly.instantiateStreaming = async (resp, importObject) => {
+				const source = await (await resp).arrayBuffer();
+				return await WebAssembly.instantiate(source, importObject);
+			};
+		}
+
+		const go = new Go();
+		let mod, inst;
+		WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((result) => {
+			mod = result.module;
+			inst = result.instance;
+			document.getElementById("runButton").disabled = false;
+		}).catch((err) => {
+			console.error(err);
+		});
+
+		async function run() {
+			console.log("--------------------");
+			window.go = go
+			await go.run(inst);
+			inst = await WebAssembly.instantiate(mod, go.importObject); // reset instance
+		}
+
+		window.setTimeout(run, 300);
+	</script>
+
+	<div class="editor-container">
+		<textarea id="ipldSchema" class="editor" placeholder="Enter your IPLD schema here">
+type Foo struct {
+	baz Float
+}
+		</textarea>
+		<textarea id="ipldData" class="editor" placeholder="Enter your data here">
+{ "baz": 1.23 }
+		</textarea>
+	</div>
+
+
+	<button onClick="run();" id="runButton" disabled>Check</button>
+	<div>
+		<p id="validationResult"></p>
+	</div>
+</body>
+
+</html>
