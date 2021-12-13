@@ -39,18 +39,29 @@
 			inst = await WebAssembly.instantiate(mod, go.importObject); // reset instance
 		}
 
+		function contentChanged() {
+			console.log("Changed")
+			run()
+		}
+
 		window.setTimeout(run, 300);
 	</script>
 
 	<div class="editor-container">
-		<textarea id="ipldSchema" class="editor" placeholder="Enter your IPLD schema here">
+		<div>
+			<h3>Schema</h3>
+			<textarea id="ipldSchema" onchange="contentChanged()" class="editor" placeholder="Enter your IPLD schema here">
 type Foo struct {
 	baz Float
 }
 		</textarea>
-		<textarea id="ipldData" class="editor" placeholder="Enter your data here">
+		</div>
+		<div>
+			<h3>Data</h3>
+			<textarea id="ipldData" onchange="contentChanged()" class="editor" placeholder="Enter your data here">
 { "baz": 1.23 }
 		</textarea>
+		</div>
 	</div>
 
 
@@ -58,6 +69,8 @@ type Foo struct {
 	<div>
 		<p id="validationResult"></p>
 	</div>
+
+	<a href="https://ipld.io/docs/schemas/">Learn more about IPLD Schemas</a>
 </body>
 
 </html>
